@@ -23,7 +23,7 @@ st.set_page_config(page_title="DataPrep", layout="wide")
 st.markdown(
     """
     <style>
-    .block-container { padding-top: 1.4rem; padding-bottom: 2.5rem; max-width: 1200px; }
+    .block-container { padding-top: 1.4rem; padding-bottom: 2.5rem; max-width: 1300px; }
     h1 { color: #2B6CB0 !important; }
     div.stButton > button,
     div.stButton > button:hover,
@@ -148,9 +148,13 @@ if run_clicked:
         st.exception(exc)
         st.stop()
 
-    tab_quality, tab_model, tab_pipeline, tab_cm = st.tabs(
-        ["Kvalitet podataka", "Metrike modela", "Šta je pipeline uradio?", "Koliko često model pogodi?"]
+    tab_quality, tab_model, tab_pipeline, tab_cm, tab_cleaned = st.tabs(
+        ["Kvalitet podataka", "Metrike modela", "Šta je pipeline uradio?", "Koliko često model pogodi?", "Očišćeni podaci"]
     )
+
+    ##tab_quality, tab_model, tab_pipeline, tab_cm = st.tabs(
+    #     ["Kvalitet podataka", "Metrike modela", "Šta je pipeline uradio?", "Koliko često model pogodi?"]
+    # )
 
     with tab_quality:
         st.caption(
@@ -230,3 +234,14 @@ Objašnjenje:
         cm_col, _ = st.columns([7, 3])
         with cm_col:
             st.pyplot(_plot_confusion_matrices(baseline_cm, clean_cm), use_container_width=True)
+
+
+    with tab_cleaned:
+        st.caption("Podaci nakon cleaninga (imputacija + IQR), bez drop kolona iz konfiguracije.")
+        st.dataframe(payload["cleaned_df"], use_container_width=True)
+        st.download_button(
+            "Preuzmi CLEANED .csv file",
+            data=payload["cleaned_df"].to_csv(index=False).encode("utf-8"),
+            file_name="cleaned_dataset.csv",
+            mime="text/csv",
+        )
